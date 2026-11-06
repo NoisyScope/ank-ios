@@ -45,7 +45,7 @@ for i in range(ROUNDS):
     print(f"  round {i + 1}: recorded {n}, revlog {revlog}, report: {report}", flush=True)
     r.check(f"round {i + 1} SQLite integrity ok", ok)
     r.check(f"round {i + 1} no answers lost", behind <= 0, f"behind by {behind}" if behind > 0 else "")
-    r.check(f"round {i + 1} report matches control", report.split(" to ")[0] == control.split(" to ")[0] or report == "no problems", report)
+    r.check(f"round {i + 1} report shows no damage", report == "no problems" or report.startswith("Added last review time"), report)
     total += n
     baseline = revlog
 

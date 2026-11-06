@@ -2,6 +2,8 @@
 
 # Ank-ios
 
+[![CI](https://github.com/NoisyScope/ank-ios/actions/workflows/ci.yml/badge.svg)](https://github.com/NoisyScope/ank-ios/actions/workflows/ci.yml)
+
 An unofficial iOS flashcard app built on Anki's open-source Rust core and web pages (from Anki 26.09.4).
 It syncs with AnkiWeb, works offline, and keeps your scheduling compatible with other Anki apps.
 
@@ -109,6 +111,9 @@ Set `SIM` to choose a simulator, and `SKIP_SCALE=1` to skip the Release-only 100
 
 The sync tests use Anki's own sync server on this Mac with a throwaway account from
 `tests/sync-test.env`. They never contact AnkiWeb.
+
+Every push to `main` runs these on GitHub's free macOS machines, except `scale_test.py` and `device_test.py`.
+The first build there takes about 20 minutes, and later runs reuse a cache.
 
 ## Rebuild the libraries
 
