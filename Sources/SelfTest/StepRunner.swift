@@ -173,8 +173,9 @@ import UIKit
             var finished = false, shown = -1, blocked = false
             let task = Task { await app.start(); finished = true }
             while !finished || shown < 0, Date().timeIntervalSince(began) < 30 {
-                if app.sync.busy { blocked = true }
                 if shown < 0, app.study.phase == .question || app.study.phase == .done { shown = Int(Date().timeIntervalSince(began) * 1000) }
+                // Syncing after the card is fine. Only a sync before it would make the user wait.
+                if shown < 0, app.sync.busy { blocked = true }
                 try await Task.sleep(for: .milliseconds(20))
             }
             await task.value
