@@ -38,18 +38,17 @@ struct RootView: View {
         .onReceive(app.session.$generation.dropFirst()) { _ in Task { await app.study.refresh() } }
         .onChange(of: phase) { _, p in
             log("app phase: \(p)")
-            switch p {
-            case .background:
-                app.study.speech.stop()
-                app.sync.syncOnLeaving()
-                app.session.enteredBackground()
-            case .active:
-                Task {
-                    await app.session.enteredForeground()
-                    await app.sync.syncIfDue(olderThan: 300)
-                }
-            default: break
+            guard p == .active else { return }
+            Task {
+                await app.session.enteredForeground()
+                await app.sync.syncIfDue(olderThan: 300)
             }
+        }
+        // Not the scene phase, which never reports leaving if the app hadn't become active yet.
+        .onReceive(NotificationCenter.default.publisher(for: UIApplication.didEnterBackgroundNotification)) { _ in
+            app.study.speech.stop()
+            app.sync.syncOnLeaving()
+            app.session.enteredBackground()
         }
         // Full syncs always ask, and the question lives on this tab.
         .onReceive(app.sync.$prompt) { p in if p != nil { app.tab = 2 } }
