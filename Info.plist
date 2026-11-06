@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0"><dict>
+<key>CFBundleIdentifier</key><string>net.ankicoretest.smoke.d6bf48</string>
+<key>CFBundleExecutable</key><string>AnkiStudy</string>
+<key>CFBundleName</key><string>AnkiStudy</string>
+<key>CFBundlePackageType</key><string>APPL</string>
+<key>CFBundleShortVersionString</key><string>0.1</string>
+<key>CFBundleVersion</key><string>1</string>
+<key>CFBundleDisplayName</key><string>Ank-ios</string>
+<key>CFBundleDocumentTypes</key><array><dict>
+  <key>CFBundleTypeName</key><string>Anki package</string>
+  <key>LSHandlerRank</key><string>Alternate</string>
+  <key>LSItemContentTypes</key><array><string>net.ankiweb.apkg</string><string>net.ankiweb.colpkg</string></array>
+</dict></array>
+<key>UTImportedTypeDeclarations</key><array>
+  <dict><key>UTTypeIdentifier</key><string>net.ankiweb.apkg</string><key>UTTypeDescription</key><string>Anki deck package</string>
+    <key>UTTypeConformsTo</key><array><string>public.data</string></array>
+    <key>UTTypeTagSpecification</key><dict><key>public.filename-extension</key><array><string>apkg</string></array></dict></dict>
+  <dict><key>UTTypeIdentifier</key><string>net.ankiweb.colpkg</string><key>UTTypeDescription</key><string>Anki collection package</string>
+    <key>UTTypeConformsTo</key><array><string>public.data</string></array>
+    <key>UTTypeTagSpecification</key><dict><key>public.filename-extension</key><array><string>colpkg</string></array></dict></dict>
+</array>
+<key>LSSupportsOpeningDocumentsInPlace</key><false/>
+<key>ITSAppUsesNonExemptEncryption</key><false/>
+<key>NSLocalNetworkUsageDescription</key><string>Lets you sync with a self-hosted Anki sync server on your local network.</string>
+<key>MinimumOSVersion</key><string>17.0</string>
+<key>UIDeviceFamily</key><array><integer>1</integer><integer>2</integer></array>
+<key>UILaunchScreen</key><dict/>
+<key>UIApplicationSceneManifest</key><dict><key>UIApplicationSupportsMultipleScenes</key><false/></dict>
+</dict></plist>
