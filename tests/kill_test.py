@@ -55,13 +55,16 @@ launch("--steps", "open;idle:40")
 end = time.time() + 30
 while time.time() < end and "collection opened" not in log.read_text():
     time.sleep(0.2)
+began = time.time()
 sh("xcrun", "simctl", "launch", SIM, "com.apple.Preferences")
-end = time.time() + 12
+print(f"Settings opened in {time.time() - began:.1f}s", flush=True)
+end = time.time() + 60  # the first launch of Settings is slow on a fresh machine
 while time.time() < end and "collection closed" not in log.read_text():
     time.sleep(0.2)
-r.check("background closes the collection", "collection closed" in log.read_text())
+print(f"waited {time.time() - began:.1f}s for the collection to close", flush=True)
+r.check("background closes the collection", "collection closed" in log.read_text(), log.read_text()[-300:])
 sh("xcrun", "simctl", "launch", SIM, BUNDLE)
-end = time.time() + 12
+end = time.time() + 60
 while time.time() < end and log.read_text().count("collection opened") < 2:
     time.sleep(0.2)
 r.check("foreground reopens the collection", log.read_text().count("collection opened") >= 2)
