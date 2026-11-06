@@ -87,6 +87,8 @@ enum FullSyncPrompt: String, Identifiable {
         try? Backend.run("abort_sync")
         try? Backend.run("abort_media_sync")
         error = "Sync stopped because the app was in the background. Open the app and sync again to finish."
+        retryPending = true
+        log(error)
     }
 
     private var canAutoSync: Bool {
@@ -105,14 +107,12 @@ enum FullSyncPrompt: String, Identifiable {
     /// Sends this session's work when the user leaves the app. Holds the collection open
     /// from here, because it's otherwise closed as soon as the app enters the background.
     func syncOnLeaving() {
-        log("leaving: auto=\(autoSync) signedIn=\(loggedIn) online=\(online) open=\(session.isOpen) busy=\(isActive) held=\(session.isBusy)")
         guard canAutoSync, session.isOpen, (try? Backend.count("select mod > ls from col")) == 1 else { return }
         session.hold()
         Task {
             automatic = true
             await sync()
             automatic = false
-            log("leaving sync done: error=\(error) retry=\(retryPending)")
             await session.release()
         }
     }
