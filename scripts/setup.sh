@@ -37,7 +37,7 @@ if [ ! -x "$B/swift-protobuf/.build/release/protoc-gen-swift" ]; then
     [ -d "$B/swift-protobuf" ] || git clone --quiet --depth 1 --branch "$SWIFT_PROTOBUF" https://github.com/apple/swift-protobuf.git "$B/swift-protobuf"
     (cd "$B/swift-protobuf" && swift build -c release --product protoc-gen-swift)
 fi
-"$ROOT/scripts/build-bridge.sh" all
+"$ROOT/scripts/build-bridge.sh" "${BRIDGE_MODE:-all}" # debug, release or all
 
 mkdir -p "$ROOT/web"
 rsync -aL --delete --exclude '*.map' "$A/out/qt/_aqt/data/web/" "$ROOT/web/"

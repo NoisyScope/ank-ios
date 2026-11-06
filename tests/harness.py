@@ -28,7 +28,7 @@ SIM = pick_simulator()
 def build(config="Debug"):
     """Builds and installs. Release includes the test runner, so timings reflect a shipping build."""
     extra = ["SWIFT_ACTIVE_COMPILATION_CONDITIONS=SELFTEST"] if config == "Release" else []
-    # The sync tests store a token in the Keychain, which needs a signed build.
+    # Simulator builds work unsigned. This is only for testing with your own signing.
     if os.environ.get("DEVELOPMENT_TEAM"):
         extra.append(f"DEVELOPMENT_TEAM={os.environ['DEVELOPMENT_TEAM']}")
     r = subprocess.run(["xcodebuild", "-project", "AnkiStudy.xcodeproj", "-scheme", "AnkiStudy", "-configuration", config,

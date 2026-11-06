@@ -86,12 +86,11 @@ compiled out of Release builds.
 
 Debug builds include a test runner, driven by launch arguments. It is compiled out of Release builds.
 
-    DEVELOPMENT_TEAM=YOURTEAMID tests/run_all.sh    # everything, in an iPhone simulator
+    tests/run_all.sh    # everything, in an iPhone simulator
     DEVELOPMENT_TEAM=YOURTEAMID DEVICE=YOURUDID build/anki/out/pyenv/bin/python tests/device_test.py
 
-`DEVELOPMENT_TEAM` is needed because the sync tests use the Keychain, which requires a signed build.
-Set `SIM` to choose a simulator. `device_test.py` runs on a connected, unlocked iPhone, and it
-**erases the app's data on that phone**.
+Set `SIM` to choose a simulator, and `SKIP_SCALE=1` to skip the Release-only 100,000-note test.
+`device_test.py` runs on a connected, unlocked iPhone, and it **erases the app's data on that phone**.
 
 | Test | Proves |
 |---|---|

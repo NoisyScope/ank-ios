@@ -1,0 +1,90 @@
+name: CI
+
+on:
+  push:
+    branches: [main, "ci/**"]
+    paths-ignore: ["**.md", "docs/**", "LICENSE", "NOTICE"]
+  pull_request:
+    paths-ignore: ["**.md", "docs/**", "LICENSE", "NOTICE"]
+  workflow_dispatch:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    name: Check scripts
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v7
+      - name: Python syntax
+        run: python3 -m compileall -q tests scripts
+      - name: Shell scripts
+        run: shellcheck --severity=error scripts/*.sh tests/*.sh
+      - name: No personal collections
+        run: |
+          if git ls-files | grep -E '\.(colpkg|apkg|anki2|anki21b?)$'; then
+            echo "A collection file is tracked" >&2
+            exit 1
+          fi
+
+  build-and-test:
+    name: Build and test
+    runs-on: macos-26
+    timeout-minutes: 240
+    env:
+      BRIDGE_MODE: debug
+      SKIP_SCALE: "1"
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Restore build cache
+        id: cache
+        uses: actions/cache/restore@v6
+        with:
+          path: |
+            build
+            lib
+            web
+          key: build-${{ runner.os }}-${{ hashFiles('scripts/**', 'bridge/**') }}
+          restore-keys: build-${{ runner.os }}-
+
+      - name: Build Anki and the bridge
+        run: scripts/setup.sh
+
+      - name: Disk space left
+        run: df -h .
+
+      # Saved before the tests, so a failing test doesn't throw away the long build.
+      - name: Save build cache
+        if: steps.cache.outputs.cache-hit != 'true'
+        uses: actions/cache/save@v6
+        with:
+          path: |
+            build
+            lib
+            web
+          key: ${{ steps.cache.outputs.cache-primary-key }}
+
+      - name: Build for iPhone, unsigned
+        run: |
+          xcodebuild -project AnkiStudy.xcodeproj -scheme AnkiStudy -configuration Debug \
+            -sdk iphoneos -destination generic/platform=iOS -derivedDataPath build/dd-device \
+            CODE_SIGNING_ALLOWED=NO build | tail -3
+
+      - name: Run the simulator tests
+        shell: bash
+        run: tests/run_all.sh 2>&1 | tee run_all.log
+
+      - name: Keep the test log
+        if: failure()
+        uses: actions/upload-artifact@v7
+        with:
+          name: test-log
+          path: run_all.log
+          if-no-files-found: ignore

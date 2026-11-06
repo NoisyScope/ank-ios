@@ -14,4 +14,5 @@ PY=../build/anki/out/pyenv/bin/python
 "$PY" undo_test.py
 "$PY" offline_test.py
 "$PY" import_test.py
-"$PY" scale_test.py "$@"
+# Needs the Release library, which CI skips to save disk space.
+[ -n "${SKIP_SCALE:-}" ] || "$PY" scale_test.py "$@"
