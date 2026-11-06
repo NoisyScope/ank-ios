@@ -37,6 +37,7 @@ struct RootView: View {
         }
         .onReceive(app.session.$generation.dropFirst()) { _ in Task { await app.study.refresh() } }
         .onChange(of: phase) { _, p in
+            log("app phase: \(p)")
             switch p {
             case .background:
                 app.study.speech.stop()

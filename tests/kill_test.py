@@ -53,8 +53,9 @@ log = docs() / "app.log"
 log.write_text("")
 launch("--steps", "open;idle:40")
 end = time.time() + 30
-while time.time() < end and "collection opened" not in log.read_text():
+while time.time() < end and not ("collection opened" in log.read_text() and "app phase: active" in log.read_text()):
     time.sleep(0.2)
+r.check("app becomes active", "app phase: active" in log.read_text(), log.read_text()[-200:])
 began = time.time()
 sh("xcrun", "simctl", "launch", SIM, "com.apple.Preferences")
 print(f"Settings opened in {time.time() - began:.1f}s", flush=True)
