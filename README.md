@@ -2,13 +2,21 @@
 
 # Ank-ios
 
-An unofficial native iOS flashcard app built on Anki's open-source Rust core and web pages (from
-Anki 26.09.4). It syncs with AnkiWeb, works offline, and keeps your scheduling compatible with
-other Anki apps.
+An unofficial iOS flashcard app built on Anki's open-source Rust core and web pages (from Anki 26.09.4).
+It syncs with AnkiWeb, works offline, and keeps your scheduling compatible with other Anki apps.
 
-This project is not affiliated with or endorsed by Ankitects. It is an early, independent project
-and is not yet a full Anki client. **Back up your collection before syncing a real account with it**,
-because a bug in an early client can spread to AnkiWeb and your other devices.
+> [!IMPORTANT]
+> **This is a development experiment, not a product.** There is no App Store release, TestFlight or
+> download. To use it, you build it and sign it yourself, and it stops opening after 7 days unless you
+> have a paid Apple developer account.
+
+**This project fully supports Anki.** If you want a hassle-free app, please buy the official
+[AnkiMobile](https://apps.apple.com/us/app/ankimobile-flashcards/id373493387) from the App Store.
+It's made by Anki's developers, and buying it helps fund Anki.
+
+Ank-ios isn't affiliated with or endorsed by Ankitects. It's an early, independent project and not a full
+Anki client. **Back up your collection before syncing a real account with it**, because a bug in an
+early client can spread to AnkiWeb and your other devices.
 
 | Study | Answer | Add Card | Stats | Sync & Data |
 |---|---|---|---|---|
@@ -58,12 +66,14 @@ takes several GB.
     cd ank-ios
     scripts/setup.sh
 
-Open `AnkiStudy.xcodeproj`, choose a simulator or device, and press Run. On a real iPhone:
+Open `AnkiStudy.xcodeproj`, choose a simulator or device, and press Run. On a real iPhone, every developer
+signs their own copy:
 
-- Select your team under Signing & Capabilities, and change the bundle identifier to your own.
+- Select your own team under Signing & Capabilities, and change the bundle identifier to your own.
+  A free Apple account works.
 - Turn on Developer Mode, and trust your profile under Settings → General → VPN & Device Management.
-- With a free Apple account, the app stops opening after 7 days until you run it again.
-  Reinstalling over it keeps your data, but deleting the app doesn't.
+- With a free account, the app stops opening after 7 days. Build and run it again to reset the time limit.
+  Reinstalling over it keeps your data, but deleting the app doesn't, so sync before the limit.
 
 ## How it works
 
