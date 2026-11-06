@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """What protects a real collection: automatic sync, long syncs, repair and restore."""
 import subprocess, time
-from harness import Report, SIM, build, launch, steps
+from harness import Report, SIM, build, docs, launch, steps
 from peer import Desktop, PASSWORD, URL, USER, start_server
 
 ARGS = ("--sync-url", URL, "--sync-user", USER, "--sync-pass", PASSWORD)
@@ -42,6 +42,7 @@ try:
         full = dk.sync() or full
         if dk.count("notes") == 1502:
             break
+    print((docs() / "app.log").read_text()[-600:], flush=True)
     r.check("leaving the app needs no full sync", not full)
     r.check("leaving the app sends changes", dk.count("notes") == 1502, dk.count("notes"))
 
