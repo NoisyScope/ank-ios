@@ -51,8 +51,10 @@ for i in range(ROUNDS):
 
 log = docs() / "app.log"
 log.write_text("")
-launch("--steps", "open;idle:25")
-time.sleep(2.5)
+launch("--steps", "open;idle:40")
+end = time.time() + 30
+while time.time() < end and "collection opened" not in log.read_text():
+    time.sleep(0.2)
 sh("xcrun", "simctl", "launch", SIM, "com.apple.Preferences")
 end = time.time() + 12
 while time.time() < end and "collection closed" not in log.read_text():

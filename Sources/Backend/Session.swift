@@ -29,6 +29,8 @@ import SwiftUI
             error = ""
             log("collection opened")
             generation += 1
+            // The user may have left while it was opening.
+            if inBackground && busyCount == 0 { await close() }
         } catch {
             self.error = "Could not open your collection: \(error.localizedDescription)"
             log("open failed: \(error)")
