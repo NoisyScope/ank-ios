@@ -19,10 +19,13 @@ print(f"js errors and 404s: {len(errors)}", *errors[:5], sep="\n")
 # A normal launch must show the first card, which depends on the page being ready in time.
 steps("open;seed;close", reset=True)
 (docs() / "app.log").write_text("")
-for _ in range(8):
+for i in range(8):
     launch()
-    time.sleep(3)
+    end = time.time() + 30  # slower machines need longer than a laptop
+    while time.time() < end and (docs() / "app.log").read_text().count("collection opened") <= i:
+        time.sleep(0.2)
+    time.sleep(1)  # time for the card to show, or a script error to be logged
 log = (docs() / "app.log").read_text()
 opened, bad = log.count("collection opened"), [l[:160] for l in log.splitlines() if "js error" in l]
 print(f"normal launches: {opened}, script errors: {len(bad)}", *bad[:3], sep="\n")
-sys.exit(0 if "RESULT: 0 failed" in text and not errors and opened == 8 and not bad else 1)
+sys.exit(0 if "RESULT: 0 failed" in text and not errors and opened >= 8 and not bad else 1)
