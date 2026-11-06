@@ -36,8 +36,13 @@ try:
     dk.sync()
     r.check("nothing is sent before leaving", dk.count("notes") == 1501, dk.count("notes"))
     subprocess.run(["xcrun", "simctl", "launch", SIM, "com.apple.Preferences"], capture_output=True)
-    time.sleep(4)
-    r.check("leaving the app needs no full sync", not dk.sync())
+    full = False
+    for _ in range(30):  # slower machines need longer than a laptop
+        time.sleep(1)
+        full = dk.sync() or full
+        if dk.count("notes") == 1502:
+            break
+    r.check("leaving the app needs no full sync", not full)
     r.check("leaving the app sends changes", dk.count("notes") == 1502, dk.count("notes"))
 
     d = steps("open;auto:off;idle:3;restore-login;add:stays here")
