@@ -18,6 +18,10 @@ final class SchemeHandler: NSObject, WKURLSchemeHandler {
     <link rel="stylesheet" href="/_anki/css/reviewer.css"><script src="/_anki/js/reviewer.js"></script></head>
     <body class="card"><div id="_mark" hidden>&#x2605;</div><div id="_flag" hidden>&#x2691;</div><div id="qa" dir="auto"></div></body></html>
     """
+    private static let pageFont = """
+    <style>html, body, button, input, select, textarea { font-family: -apple-system, system-ui, sans-serif; }
+    body { font-variant-numeric: tabular-nums; -webkit-font-smoothing: antialiased; }</style>
+    """
     private static let mimeTypes = [
         "js": "text/javascript", "mjs": "text/javascript", "css": "text/css", "html": "text/html", "svg": "image/svg+xml",
         "png": "image/png", "jpg": "image/jpeg", "jpeg": "image/jpeg", "gif": "image/gif", "webp": "image/webp",
@@ -70,6 +74,8 @@ final class SchemeHandler: NSObject, WKURLSchemeHandler {
         if Self.routes.contains(first), var html = (try? Data(contentsOf: web.appendingPathComponent("sveltekit/index.html"))).flatMap({ String(data: $0, encoding: .utf8) }) {
             // Same as desktop's _strip_csp_meta for trusted pages.
             html = html.replacingOccurrences(of: #"<meta[^>]*http-equiv=["']?content-security-policy[^>]*>"#, with: "", options: [.regularExpression, .caseInsensitive])
+            // Desktop's window supplies the font. Without it these pages fall back to Times.
+            html = html.replacingOccurrences(of: "</head>", with: Self.pageFont + "</head>")
             return (200, "text/html", Data(html.utf8))
         }
         var url: URL

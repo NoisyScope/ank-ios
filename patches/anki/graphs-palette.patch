@@ -1,0 +1,280 @@
+diff --git a/ts/routes/graphs/TrueRetentionCombined.svelte b/ts/routes/graphs/TrueRetentionCombined.svelte
+index 5a9efc8..870791a 100644
+--- a/ts/routes/graphs/TrueRetentionCombined.svelte
++++ b/ts/routes/graphs/TrueRetentionCombined.svelte
+@@ -84,11 +84,11 @@ License: GNU AGPL, version 3 or later; http://www.gnu.org/licenses/agpl.html
+     }
+ 
+     .young {
+-        color: #64c476;
++        color: #4a98c9;
+     }
+ 
+     .mature {
+-        color: #31a354;
++        color: #2166a8;
+     }
+ 
+     .total {
+diff --git a/ts/routes/graphs/TrueRetentionSingle.svelte b/ts/routes/graphs/TrueRetentionSingle.svelte
+index 9199717..4bad794 100644
+--- a/ts/routes/graphs/TrueRetentionSingle.svelte
++++ b/ts/routes/graphs/TrueRetentionSingle.svelte
+@@ -71,11 +71,11 @@ License: GNU AGPL, version 3 or later; http://www.gnu.org/licenses/agpl.html
+     }
+ 
+     .pass {
+-        color: #3bc464;
++        color: #2166a8;
+     }
+ 
+     .fail {
+-        color: #c43b3b;
++        color: #c95f3d;
+     }
+ 
+     .retention {
+diff --git a/ts/routes/graphs/buttons.ts b/ts/routes/graphs/buttons.ts
+index 6063805..c62b1c3 100644
+--- a/ts/routes/graphs/buttons.ts
++++ b/ts/routes/graphs/buttons.ts
+@@ -11,7 +11,6 @@ import { localizedNumber } from "@tslib/i18n";
+ import {
+     axisBottom,
+     axisLeft,
+-    interpolateRdYlGn,
+     pointer,
+     scaleBand,
+     scaleLinear,
+@@ -19,6 +18,7 @@ import {
+     select,
+     sum,
+ } from "d3";
++import { buttons } from "./palette";
+ 
+ import type { GraphBounds } from "./graph-helpers";
+ import { GraphRange } from "./graph-helpers";
+@@ -162,7 +162,7 @@ export function renderButtons(
+         .paddingOuter(1)
+         .paddingInner(0.1);
+ 
+-    const colour = scaleSequential(interpolateRdYlGn).domain([1, 4]);
++    const colour = (button: number): string => buttons[button - 1];
+ 
+     // y scale
+     const yTickFormat = (n: number): string => localizedNumber(n);
+diff --git a/ts/routes/graphs/calendar.ts b/ts/routes/graphs/calendar.ts
+index 8639230..234953a 100644
+--- a/ts/routes/graphs/calendar.ts
++++ b/ts/routes/graphs/calendar.ts
+@@ -167,10 +167,11 @@ export function renderCalendar(
+         .attr("x", x(1)! - 3)
+         .attr("y", (_d, index) => bounds.marginTop + index * height)
+         .attr("fill", nightMode ? "#ddd" : "black")
++        .style("fill", "var(--fg-subtle)")
+         .attr("dominant-baseline", "hanging")
+         .attr("text-anchor", "end")
+-        .attr("font-size", firstLang.includes("zh") ? "xx-small" : "small")
+-        .attr("font-family", "monospace")
++        // Ank-ios: fit each letter inside its row, like the other graphs' axis labels.
++        .attr("font-size", firstLang.includes("zh") ? "xx-small" : height * 0.72)
+         .attr("direction", "ltr")
+         .style("user-select", "none")
+         .on("click", null)
+diff --git a/ts/routes/graphs/card-counts.ts b/ts/routes/graphs/card-counts.ts
+index e31c0a5..068beec 100644
+--- a/ts/routes/graphs/card-counts.ts
++++ b/ts/routes/graphs/card-counts.ts
+@@ -14,13 +14,10 @@ import {
+     interpolate,
+     pie,
+     scaleLinear,
+-    schemeBlues,
+-    schemeGreens,
+-    schemeOranges,
+-    schemeReds,
+     select,
+     sum,
+ } from "d3";
++import { accent, blue, learning } from "./palette";
+ 
+ import type { GraphBounds } from "./graph-helpers";
+ 
+@@ -32,13 +29,13 @@ export interface GraphData {
+ }
+ 
+ const barColours = [
+-    schemeBlues[5][2], /* new */
+-    schemeOranges[5][2], /* learn */
+-    schemeReds[5][2], /* relearn */
+-    schemeGreens[5][2], /* young */
+-    schemeGreens[5][3], /* mature */
+-    "#FFDC41", /* suspended */
+-    "grey", /* buried */
++    blue(0.3), /* new */
++    learning(0.6), /* learn */
++    accent, /* relearn */
++    blue(0.55), /* young */
++    blue(0.85), /* mature */
++    "#c9c2a6", /* suspended */
++    "#9aa3ad", /* buried */
+ ];
+ 
+ function countCards(data: GraphsResponse, separateInactive: boolean): Count[] {
+diff --git a/ts/routes/graphs/difficulty.ts b/ts/routes/graphs/difficulty.ts
+index 4f36ecd..04fc3d2 100644
+--- a/ts/routes/graphs/difficulty.ts
++++ b/ts/routes/graphs/difficulty.ts
+@@ -9,7 +9,8 @@ import type { GraphsResponse } from "@generated/anki/stats_pb";
+ import * as tr from "@generated/ftl";
+ import { localizedNumber } from "@tslib/i18n";
+ import type { Bin } from "d3";
+-import { bin, interpolateRdYlGn, scaleSequential, sum } from "d3";
++import { goodness } from "./palette";
++import { bin, scaleSequential, sum } from "d3";
+ 
+ import type { SearchDispatch, TableDatum } from "./graph-helpers";
+ import { getNumericMapBinValue, numericMap } from "./graph-helpers";
+@@ -58,7 +59,7 @@ export function prepareData(
+         .thresholds(ticks)(allEases.entries() as any);
+     const total = sum(bins as any, getNumericMapBinValue);
+ 
+-    const colourScale = scaleSequential(interpolateRdYlGn).domain([100, 0]);
++    const colourScale = scaleSequential(goodness).domain([100, 0]);
+ 
+     function hoverText(bin: Bin<number, number>, _percent: number): string {
+         const percent = `${bin.x0}%-${bin.x1}%`;
+diff --git a/ts/routes/graphs/ease.ts b/ts/routes/graphs/ease.ts
+index 26de020..8fc5764 100644
+--- a/ts/routes/graphs/ease.ts
++++ b/ts/routes/graphs/ease.ts
+@@ -9,7 +9,8 @@ import type { GraphsResponse } from "@generated/anki/stats_pb";
+ import * as tr from "@generated/ftl";
+ import { localizedNumber } from "@tslib/i18n";
+ import type { Bin, ScaleLinear } from "d3";
+-import { bin, extent, interpolateRdYlGn, scaleLinear, scaleSequential, sum } from "d3";
++import { goodness } from "./palette";
++import { bin, extent, scaleLinear, scaleSequential, sum } from "d3";
+ 
+ import type { SearchDispatch, TableDatum } from "./graph-helpers";
+ import { getNumericMapBinValue, numericMap } from "./graph-helpers";
+@@ -84,7 +85,7 @@ export function prepareData(
+         .thresholds(ticks)(allEases.entries() as any);
+     const total = sum(bins as any, getNumericMapBinValue);
+ 
+-    const colourScale = scaleSequential(interpolateRdYlGn).domain([xMin, 300]);
++    const colourScale = scaleSequential(goodness).domain([xMin, 300]);
+ 
+     function hoverText(bin: Bin<number, number>, _percent: number): string {
+         const minPct = Math.floor(bin.x0!);
+diff --git a/ts/routes/graphs/future-due.ts b/ts/routes/graphs/future-due.ts
+index 6100470..4314b7b 100644
+--- a/ts/routes/graphs/future-due.ts
++++ b/ts/routes/graphs/future-due.ts
+@@ -10,7 +10,7 @@ import * as tr from "@generated/ftl";
+ import { localizedNumber } from "@tslib/i18n";
+ import { dayLabel } from "@tslib/time";
+ import type { Bin } from "d3";
+-import { bin, extent, interpolateGreens, scaleLinear, scaleSequential, sum } from "d3";
++import { bin, extent, interpolateBlues, scaleLinear, scaleSequential, sum } from "d3";
+ 
+ import type { SearchDispatch, TableDatum } from "./graph-helpers";
+ import { getNumericMapBinValue, GraphRange, numericMap } from "./graph-helpers";
+@@ -109,7 +109,7 @@ export function buildHistogram(
+ 
+     const xTickFormat = (n: number): string => localizedNumber(n);
+     const adjustedRange = scaleLinear().range([0.7, 0.3]);
+-    const colourScale = scaleSequential((n) => interpolateGreens(adjustedRange(n)!)).domain([xMin!, xMax!]);
++    const colourScale = scaleSequential((n) => interpolateBlues(adjustedRange(n)!)).domain([xMin!, xMax!]);
+ 
+     const total = sum(bins as any, getNumericMapBinValue);
+ 
+diff --git a/ts/routes/graphs/palette.ts b/ts/routes/graphs/palette.ts
+new file mode 100644
+index 0000000..aefb3d7
+--- /dev/null
++++ b/ts/routes/graphs/palette.ts
+@@ -0,0 +1,16 @@
++// Copyright: Ankitects Pty Ltd and contributors
++// License: GNU AGPL, version 3 or later; http://www.gnu.org/licenses/agpl.html
++
++// Ank-ios: one palette for every graph, built on the calendar's blues. A single warm
++// accent marks the "bad" end (lapses, Again, high difficulty) so it still stands out.
++import { interpolateBlues, interpolateRgbBasis } from "d3";
++
++export const accent = "#e4805f";
++export const blue = (t: number): string => interpolateBlues(t);
++/** 0 is bad, 1 is good. */
++export const goodness = interpolateRgbBasis([accent, "#f2c3ae", "#a9cce3", "#2a6fb0"]);
++export const learning = interpolateRgbBasis(["#9fd3d6", "#4fa6ad"]);
++export const filtered = interpolateRgbBasis(["#b9b6dc", "#7d77b8"]);
++/** Again, Hard, Good, Easy. */
++export const buttons = [accent, "#f2c3ae", blue(0.55), blue(0.85)];
++export const lapse = interpolateRgbBasis(["#f2b8a2", accent]);
+diff --git a/ts/routes/graphs/retrievability.ts b/ts/routes/graphs/retrievability.ts
+index 6a1a391..4284122 100644
+--- a/ts/routes/graphs/retrievability.ts
++++ b/ts/routes/graphs/retrievability.ts
+@@ -9,7 +9,8 @@ import type { GraphsResponse } from "@generated/anki/stats_pb";
+ import * as tr from "@generated/ftl";
+ import { localizedNumber } from "@tslib/i18n";
+ import type { Bin } from "d3";
+-import { bin, interpolateRdYlGn, scaleSequential, sum } from "d3";
++import { goodness } from "./palette";
++import { bin, scaleSequential, sum } from "d3";
+ 
+ import type { SearchDispatch, TableDatum } from "./graph-helpers";
+ import { getNumericMapBinValue, numericMap } from "./graph-helpers";
+@@ -65,7 +66,7 @@ export function prepareData(
+         .thresholds(ticks)(allEases.entries() as any);
+     const total = sum(bins as any, getNumericMapBinValue);
+ 
+-    const colourScale = scaleSequential(interpolateRdYlGn).domain([0, 100]);
++    const colourScale = scaleSequential(goodness).domain([0, 100]);
+ 
+     function hoverText(bin: Bin<number, number>, _percent: number): string {
+         const percent = `${bin.x0}%-${bin.x1}%`;
+diff --git a/ts/routes/graphs/reviews.ts b/ts/routes/graphs/reviews.ts
+index 64cbdb6..8281f00 100644
+--- a/ts/routes/graphs/reviews.ts
++++ b/ts/routes/graphs/reviews.ts
+@@ -10,6 +10,7 @@ import * as tr from "@generated/ftl";
+ import { localizedNumber } from "@tslib/i18n";
+ import { dayLabel, timeSpan, TimespanUnit } from "@tslib/time";
+ import type { Bin, ScaleSequential } from "d3";
++import { blue, filtered, lapse, learning } from "./palette";
+ import {
+     area,
+     axisBottom,
+@@ -18,10 +19,6 @@ import {
+     bin,
+     cumsum,
+     curveBasis,
+-    interpolateGreens,
+-    interpolateOranges,
+-    interpolatePurples,
+-    interpolateReds,
+     max,
+     min,
+     pointer,
+@@ -189,15 +186,15 @@ export function renderReviews(
+ 
+     const cappedRange = scaleLinear().range([0.3, 0.5]);
+     const shiftedRange = scaleLinear().range([0.4, 0.7]);
+-    const darkerGreens = scaleSequential((n) => interpolateGreens(shiftedRange(n)!)).domain(x.domain() as any);
+-    const lighterGreens = scaleSequential((n) => interpolateGreens(cappedRange(n)!)).domain(x.domain() as any);
+-    const reds = scaleSequential((n) => interpolateReds(cappedRange(n)!)).domain(
++    const darkerGreens = scaleSequential((n) => blue(shiftedRange(n)! + 0.2)).domain(x.domain() as any);
++    const lighterGreens = scaleSequential((n) => blue(cappedRange(n)!)).domain(x.domain() as any);
++    const reds = scaleSequential((n) => lapse((cappedRange(n)! - 0.3) * 5)).domain(
+         x.domain() as any,
+     );
+-    const oranges = scaleSequential((n) => interpolateOranges(cappedRange(n)!)).domain(
++    const oranges = scaleSequential((n) => learning((cappedRange(n)! - 0.3) * 5)).domain(
+         x.domain() as any,
+     );
+-    const purples = scaleSequential((n) => interpolatePurples(cappedRange(n)!)).domain(
++    const purples = scaleSequential((n) => filtered((cappedRange(n)! - 0.3) * 5)).domain(
+         x.domain() as any,
+     );
+ 

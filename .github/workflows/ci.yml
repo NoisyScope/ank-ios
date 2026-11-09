@@ -51,7 +51,7 @@ jobs:
             build
             lib
             web
-          key: build-${{ runner.os }}-${{ hashFiles('scripts/**', 'bridge/**') }}
+          key: build-${{ runner.os }}-${{ hashFiles('scripts/**', 'bridge/**', 'patches/**') }}
           restore-keys: build-${{ runner.os }}-
 
       - name: Build Anki and the bridge

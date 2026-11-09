@@ -14,6 +14,10 @@ mkdir -p "$B"
 A=$B/anki
 [ -d "$A" ] || git clone --quiet --depth 1 --branch "$TAG" https://github.com/ankitects/anki.git "$A"
 git -C "$A" submodule update --init --depth 1 ftl/core-repo ftl/qt-repo
+# Ank-ios's own changes to Anki, such as one colour palette for the Stats graphs.
+for p in "$ROOT"/patches/anki/*.patch; do
+    git -C "$A" apply --reverse --check "$p" 2>/dev/null || git -C "$A" apply "$p"
+done
 
 RUST=$(sed -n 's/^channel = "\(.*\)"/\1/p' "$A/rust-toolchain.toml")
 
